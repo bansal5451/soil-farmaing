@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Registration - Soil Farming Agent</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="user-login.css" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous">   
+  </script>
+</head>
+<body>
+
+  <div class="container">
+    <h2 style="position: relative; bottom: 13px; right: 5px; color: aliceblue; ">📝 User Registration</h2>
+    <form id="userRegisterForm">
+      <div class="form-group mb-3">
+        <input type="text" class="form-control" placeholder="Username" id="username" required>
+      </div>
+      <div class="form-group mb-3">
+        <input type="email" class="form-control" placeholder="Email" id="userEmail" required>
+      </div>
+      <div class="form-group mb-3">
+        <input type="password" class="form-control" placeholder="Password" id="userPassword" required>
+      </div>
+      <p class="color">Already have an account?<a style="color: rgba(70, 203, 203, 0.844);"href="user-login.html">Login</a></p>
+      <button type="submit" class="btn">Register</button>
+    </form>
+    <p id="registerMsg" class="error-msg"></p>
+  </div>
+
+  <!-- Firebase SDK (MODULAR) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    // ✅ Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyByQ5zjhqKrvcKqVsYGtjEpCOJ5rrywPFo",
+      authDomain: "soil-farming-3d1dc.firebaseapp.com",
+      projectId: "soil-farming-3d1dc",
+      storageBucket: "soil-farming-3d1dc.appspot.com",
+      messagingSenderId: "1031308797681",
+      appId: "1:1031308797681:web:6459083d694367495a6b50",
+      measurementId: "G-HYBQZQXMRH"
+    };
+
+    // ✅ Initialize Firebase App
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ✅ Form Submission Handler
+    document.getElementById("userRegisterForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("userEmail").value.trim();
+      const password = document.getElementById("userPassword").value;
+      const messageEl = document.getElementById("registerMsg");
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          return setDoc(doc(db, "users", user.uid), {
+            username: username,
+            email: email,
+            createdAt: serverTimestamp()
+          });
+        })
+        .then(() => {
+          messageEl.style.color = "lightgreen";
+          messageEl.textContent = "✅ Registration successful!";
+          document.getElementById("userRegisterForm").reset();
+        })
+        .catch((error) => {
+          messageEl.style.color = "red";
+          messageEl.textContent = `❌ ${error.message}`;
+        });
+    });
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
