@@ -1,2 +1,2 @@
-# soil farmaing
+# soil farming
 
